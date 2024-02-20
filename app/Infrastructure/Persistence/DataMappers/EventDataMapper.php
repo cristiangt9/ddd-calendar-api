@@ -16,7 +16,8 @@ class EventDataMapper
       $eloquentEvent->start,
       $eloquentEvent->end,
       $eloquentEvent->frequency,
-      $eloquentEvent->repeat_until
+      $eloquentEvent->repeat_until,
+      $eloquentEvent->original_event_id,
     );
     if($eloquentEvent->id) {
       $new_event->setId($eloquentEvent->id);
@@ -26,18 +27,15 @@ class EventDataMapper
 
   public function mapToEloquent(Event $event): EloquentEvent
   {
-    $values = [
-      'title' => $event->getTitle(),
-      'description' => $event->getDescription(),
-      'start' => $event->getStart(),
-      'end' => $event->getEnd(),
-      'frequency' => $event->getFrequency(),
-      'repeat_until' => $event->getRepeatUntil(),
-    ];
-    if($event->getId()) {
-      $values = array_merge($values, ['id' => $event->getId()]);
+    return EloquentEvent::create($event->toArray());
+  }
+
+  public function mapToEntities(Collection $events): array
+  {
+    $eventsArray = [];
+    foreach ($events as $event) {
+      $eventsArray[] = $this->mapToEntity($event);
     }
-  
-    return EloquentEvent::create($values);
+    return $eventsArray;
   }
 }

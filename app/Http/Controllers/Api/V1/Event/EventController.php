@@ -6,10 +6,9 @@ use App\Domain\Entities\Event;
 use App\Domain\Entities\RecurringPattern;
 use App\Domain\Services\EventServiceInterface;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateEventRequest;
+use App\Http\Requests\Api\V1\Event\CreateEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
@@ -40,9 +39,11 @@ class EventController extends Controller
         return response()->json(['event' => $event->toArray()]);
     }
 
-    public function store(Request $request)
+    public function store(CreateEventRequest $request)
     {
-        $createdEvent = $this->eventService->createEvent($request->all());
+        $validatedData = $request->validated(); // Obtiene los datos validados
+
+        $createdEvent = $this->eventService->createEvent($validatedData);
 
         if (!$createdEvent) {
             return response()->json(['message' => 'overlaps'], 422);

@@ -5,8 +5,7 @@ namespace App\Application\Services;
 use App\Domain\Entities\Event;
 use App\Domain\Repositories\EventRepository;
 use App\Domain\Services\EventServiceInterface;
-
-
+use Carbon\Carbon;
 
 class EventService implements EventServiceInterface
 {
@@ -34,7 +33,7 @@ class EventService implements EventServiceInterface
     if (array_key_exists("recurring_pattern", $validatedData)) {
       $event->setFrequency($validatedData["recurring_pattern"]["frequency"]);
       $event->setRepeatUntil($validatedData["recurring_pattern"]["repeat_until"]);
-      // TODO: send to create in mass, for daily, weekly, monthly, or yearly
+      return $this->createFrequentEvent($event);
     }
     return $this->eventRepository->save($event);
   }
@@ -60,4 +59,41 @@ class EventService implements EventServiceInterface
     return [];
   }
 
+  // private methods
+  private function createFrequentEvent(Event $event)
+  {
+    $event = $this->eventRepository->save($event);
+    $frecuency = [
+      'daily' => 'addDays',
+      'weekly' => 'addWeeks',
+      'monthly' => 'addMonths',
+      'yearly' => 'addYears',
+    ];
+    $i = 1;
+    $frecuencyFunction = $frecuency[$event->getFrequency()];
+
+    $start = $this->createDate($event->getStart(), $frecuencyFunction, $i);
+    $end = $this->createDate($event->getEnd(), $frecuencyFunction, $i);
+
+    while ($start < $event->getRepeatUntil()) {
+      $newEvent = new Event(
+        $event->getTitle(),
+        $event->getDescription(),
+        $start,
+        $end
+      );
+      $newEvent->setOriginalEvent($event->getId());
+      $this->eventRepository->save($newEvent);
+      $i++;
+      $start = $this->createDate($event->getStart(), $frecuencyFunction, $i);
+      $end = $this->createDate($event->getEnd(), $frecuencyFunction, $i);
+    }
+
+    return $event;
+  }
+
+  private function createDate($date, $frecuencyFunction, $i): string
+  {
+    return Carbon::parse($date)->{$frecuencyFunction}($i)->format('Y-m-d\TH:i:sP');
+  }
 }
