@@ -66,8 +66,23 @@ class EloquentEventRepository implements EventRepository
    * @param Event $event
    * @return bool|null
    */
-  public function isOverlaping(Event $event): bool
+  public function isOverlapping(Event $event): bool
   {
-    return false;
+    $start = $event->getStart();
+    $end = $event->getEnd();
+
+    $query = EloquentEvent::where(function ($query) use ($start, $end) {
+      $query->WhereBetween('start', [$start, $end])
+        ->orWhereBetween('end', [$start, $end])
+        ->orWhere(function ($query) use ($start, $end) {
+          $query->where('start', '<', $start)
+            ->where('end', '>', $end);
+        });
+    });
+
+    if( $event->getId()) {
+      $query = $query->where('id', '<>', $event->getId());
+    }
+    return $query->exists();
   }
 }

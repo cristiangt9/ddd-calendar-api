@@ -23,7 +23,7 @@ class EventTest extends TestCase
         $this->assertDatabaseHas('events', ['title' => $event->title]);
     }
 
-    public function test_validate_event_creation_and_creates_event()
+    public function test_validate_event_creation_successfully()
     {
         // Intenta crear un evento sin proporcionar datos válidos
         $start = fake()->dateTimeBetween('now', '+7 days')->format(self::FORMAT_DATE);
@@ -59,7 +59,7 @@ class EventTest extends TestCase
         $response->assertStatus(422); // El código 422 indica errores de validación
     }
 
-    public function test_validate_event_creation_and_creates_events_with_recurring()
+    public function test_validate_event_creation_and_successfully_with_recurring()
     {
         // Intenta crear un evento sin proporcionar datos válidos
         $start = fake()->dateTimeBetween('now', '+1 days')->format(self::FORMAT_DATE);
@@ -79,5 +79,23 @@ class EventTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('events', ['id' => $response->json('event')['id']]);
         $this->assertDatabaseHas('events', ['original_event_id' => $response->json('event')['id']]);
+    }
+
+    public function test_create_event_fails_by_overlap()
+    {
+        $event = EloquentEvent::factory()->create();
+
+        // asserts
+        $this->assertInstanceOf(EloquentEvent::class, $event);
+        $this->assertDatabaseHas('events', ['title' => $event->title]);
+
+        $response = $this->post('/api/v1/events', [
+            'title' => $event->title,
+            'description' => $event->description,
+            'start' => $event->start,
+            'end' => $event->end
+        ]);
+
+        $response->assertStatus(422);
     }
 }

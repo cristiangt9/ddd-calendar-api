@@ -15,5 +15,5 @@ interface EventRepository
 
   public function delete(Event $event): bool|null;
 
-  public function isOverlaping(Event $event): bool;
+  public function isOverlapping(Event $event): bool;
 }
