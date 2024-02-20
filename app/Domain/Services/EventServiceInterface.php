@@ -12,7 +12,7 @@ interface EventServiceInterface
 
     public function deleteEvent($id): bool;
 
-    public function findEventById($id): Event|bool;
+    public function findEventById($id): Event|null;
 
     public function getEvents($start = null, $end = null): array|null;
 

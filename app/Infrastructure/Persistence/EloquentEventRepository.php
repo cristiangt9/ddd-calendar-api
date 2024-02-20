@@ -4,11 +4,16 @@ namespace App\Infrastructure\Persistence;
 
 use App\Domain\Entities\Event;
 use App\Domain\Repositories\EventRepository;
+use App\Infrastructure\Persistence\DataMappers\EventDataMapper;
 use App\Infrastructure\Persistence\Models\EloquentEvent;
 
 class EloquentEventRepository implements EventRepository
 {
-
+  private $eventDataMapper;
+  public function __construct(EventDataMapper $eventDataMapper)
+  {
+    $this->eventDataMapper = $eventDataMapper;
+  }
   /**
    * @param int $id
    * @return array
@@ -33,7 +38,10 @@ class EloquentEventRepository implements EventRepository
    */
   public function save(Event $event): Event
   {
-    return EloquentEvent::where(['id' => 1])->first();
+    $eloquentEvent = $this->eventDataMapper->mapToEloquent($event);
+    $eloquentEvent->save();
+
+    return $this->eventDataMapper->mapToEntity($eloquentEvent);
   }
 
   /**

@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Application\Services\EventService;
+use App\Domain\Repositories\EventRepository;
+use App\Domain\Services\EventServiceInterface;
+use App\Infrastructure\Persistence\EloquentEventRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(EventRepository::class, EloquentEventRepository::class);
+        $this->app->bind(EventServiceInterface::class, EventService::class);
     }
 
     /**
