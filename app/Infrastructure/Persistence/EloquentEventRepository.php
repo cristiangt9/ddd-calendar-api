@@ -20,7 +20,20 @@ class EloquentEventRepository implements EventRepository
    */
   public function get($start = null, $end = null): array|null
   {
-    return EloquentEvent::find();
+    if (is_null($start) && is_null($end)) {
+      return $this->eventDataMapper->mapToEntities(EloquentEvent::get());
+      // TODO: Add pagination
+    }
+
+    $query = EloquentEvent::query();
+    if ($start) {
+      $query = $query->where("start", ">=", $start);
+    }
+    if ($end) {
+      $query = $query->where("end", "<=", $end);
+    }
+
+    return $this->eventDataMapper->mapToEntities($query->get());
   }
 
   /**

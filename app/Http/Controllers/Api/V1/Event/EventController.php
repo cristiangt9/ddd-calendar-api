@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Event;
 
-use App\Domain\Entities\Event;
-use App\Domain\Entities\RecurringPattern;
 use App\Domain\Services\EventServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Event\CreateEventRequest;
-use App\Http\Requests\UpdateEventRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
@@ -21,9 +19,12 @@ class EventController extends Controller
     }
 
     
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $events = $this->eventService->getEvents();
+        $start = $request->input('start');
+        $end = $request->input('end');
+        
+        $events = $this->eventService->getEvents($start, $end);
 
         return response()->json(['events' => $events], 200);
     }

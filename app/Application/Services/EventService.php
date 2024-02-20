@@ -26,7 +26,7 @@ class EventService implements EventServiceInterface
       $validatedData["end"]
     );
     //validar si hay colision
-    if ($this->eventRepository->isOverlaping($event)) {
+    if ($this->eventRepository->isOverlapping($event)) {
       return false;
     }
 
@@ -56,7 +56,15 @@ class EventService implements EventServiceInterface
 
   public function getEvents($start = null, $end = null): array|null
   {
-    return [];
+    $result = $this->eventRepository->get($start, $end);
+    if (is_array($result)) {
+      $array = [];
+      foreach ($result as $value) {
+        $array[] = $value->toArray();
+      }
+      return $array;
+    }
+    return $result;
   }
 
   // private methods
