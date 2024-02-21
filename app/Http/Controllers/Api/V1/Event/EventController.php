@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Event;
 use App\Domain\Services\EventServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Event\CreateEventRequest;
+use App\Http\Requests\Api\V1\Event\UpdateEventRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -42,7 +43,7 @@ class EventController extends Controller
 
     public function store(CreateEventRequest $request)
     {
-        $validatedData = $request->validated(); // Obtiene los datos validados
+        $validatedData = $request->validated();
 
         $createdEvent = $this->eventService->createEvent($validatedData);
 
@@ -54,9 +55,9 @@ class EventController extends Controller
 
     }
 
-    public function update($request, $id): JsonResponse
+    public function update(UpdateEventRequest $request, $id): JsonResponse
     {
-        $validatedData = $request->validated(); // Obtiene los datos validados
+        $validatedData = $request->validated();
         $updatedEvent = $this->eventService->updateEvent($id, $validatedData);
 
         if (!$updatedEvent) {

@@ -168,4 +168,42 @@ class EventTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_update_event()
+    {
+        $event = EloquentEvent::factory()->create();
+
+        $response = $this->put("/api/v1/events/{$event->id}", [
+            'title' => 'New Title',
+            'description' => 'New description',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('events', ['title' => 'New Title']);
+    }
+    
+    public function test_update_event_fails_by_overlap()
+    {
+        $event1 = EloquentEvent::factory()->create();
+        $start = fake()->dateTimeBetween($event1->end, '+40 days')->format(self::FORMAT_DATE);
+        $end = fake()->dateTimeBetween($start, '+50 days')->format(self::FORMAT_DATE);
+        $event2 = EloquentEvent::factory()->create([
+            'title' => fake()->sentence,
+            'description' => fake()->paragraph,
+            'start' => $start,
+            'end' => $end,
+            'frequency' => fake()->randomElement(['daily', 'weekly', 'monthly', 'yearly']),
+            'repeat_until' => fake()->dateTimeBetween($end, '+365 days')->format(self::FORMAT_DATE),
+        ]);
+
+
+        $response = $this->put("/api/v1/events/{$event2->id}", [
+            'title' => 'New Title',
+            'description' => 'New description',
+            'start' => $event1->start,
+        ]);
+
+
+        $response->assertStatus(422);
+    }
 }

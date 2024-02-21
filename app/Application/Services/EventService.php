@@ -40,8 +40,18 @@ class EventService implements EventServiceInterface
 
   public function updateEvent($id, $validatedData): Event|bool|string
   {
-
-    return $this->eventRepository->findById($id);
+    $event = $this->eventRepository->findById($id);
+    if (is_null($event)) {
+      return false;
+    }
+    foreach ($validatedData as $key => $value) {
+      $getter = 'set' . str_replace('_', '', ucwords($key, '_'));
+      $event->{$getter}($value);
+    }
+    if ($this->eventRepository->isOverlapping($event)) {
+      return 'overlap';
+    }
+    return $this->eventRepository->update($event);
   }
 
   public function deleteEvent($id): bool

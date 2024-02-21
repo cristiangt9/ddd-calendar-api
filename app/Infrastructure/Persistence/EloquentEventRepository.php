@@ -67,7 +67,9 @@ class EloquentEventRepository implements EventRepository
    */
   public function update(Event $event): Event
   {
-    return EloquentEvent::where(['id' => 1])->first();
+    $eloquentEvent = $this->eventDataMapper->mapToEloquent($event);
+    $eloquentEvent->update();
+    return $this->eventDataMapper->mapToEntity($eloquentEvent);
   }
 
   /**
