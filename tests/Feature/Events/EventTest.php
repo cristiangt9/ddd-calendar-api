@@ -206,4 +206,23 @@ class EventTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_delete_event_successfully()
+    {
+        $event = EloquentEvent::factory()->create();
+
+        $response = $this->delete("/api/v1/events/{$event->id}");
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('events', ['id' => $event->id]);
+    }
+
+    public function test_delete_event_fails()
+    {
+        EloquentEvent::factory()->create();
+
+        $response = $this->delete("/api/v1/events/50");
+
+        $response->assertStatus(404);
+    }
 }

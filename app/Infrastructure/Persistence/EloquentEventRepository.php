@@ -78,7 +78,9 @@ class EloquentEventRepository implements EventRepository
    */
   public function delete(Event $event): bool|null
   {
-    return true;
+    $eloquentEvent = EloquentEvent::find($event->getId())->first();
+
+    return $eloquentEvent->delete();
   }
   
   /**

@@ -56,7 +56,11 @@ class EventService implements EventServiceInterface
 
   public function deleteEvent($id): bool
   {
-    return true;
+    $event = $this->eventRepository->findById($id);
+    if (is_null($event)) {
+      return false;
+    }
+    return $this->eventRepository->delete($event);
   }
 
   public function findEventById($id): Event|null
