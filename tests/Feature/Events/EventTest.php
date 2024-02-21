@@ -149,4 +149,23 @@ class EventTest extends TestCase
             'title' => $event1->title,
         ]);
     }
+
+    public function test_get_event_successfully()
+    {
+        $event = EloquentEvent::factory()->create();
+
+        $response = $this->get("/api/v1/events/{$event->id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['title' => $event->title]);
+    }
+
+    public function test_get_event_fails()
+    {
+        $event = EloquentEvent::factory()->create();
+
+        $response = $this->get("/api/v1/events/50");
+
+        $response->assertStatus(404);
+    }
 }

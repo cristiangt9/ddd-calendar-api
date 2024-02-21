@@ -42,7 +42,11 @@ class EloquentEventRepository implements EventRepository
    */
   public function findById($id): Event|null
   {
-    return EloquentEvent::where(['id' => $id])->first();
+    $event = EloquentEvent::whereId($id)->first() ?: null;
+    if ($event) {
+      return $this->eventDataMapper->mapToEntity($event);
+    }
+    return $event;
   }
 
   /**
