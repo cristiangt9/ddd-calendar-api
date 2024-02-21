@@ -37,3 +37,23 @@ To simplify Docker-related tasks, a Makefile has been provided with the followin
 - `make run`: Runs the Docker containers in the background.
 - `make run-attached`: Runs the Docker containers in attached mode for debugging and real-time logs. Note: Edit the Makefile and replace `<absolute_path_to_your_project>` with the absolute path to your project before using this command.
 
+## Additional Features
+
+- **End-to-End Testing**: Implemented comprehensive end-to-end tests to ensure the robustness and proper functioning of the application.
+
+- **API Versioning**: Follows a versioning system to facilitate future updates and ensure compatibility with previous versions. The current API version is specified in the routes and documentation.
+
+- **Welcome Page**: Created a welcoming page providing general information about the application, accessible upon launching.
+
+- **SQLite Database**: Utilizes SQLite as the database management system, offering a lightweight and easy-to-use solution for development and deployment.
+
+- **GitHub Repository and Branching**: Managed the application through a GitHub repository, with specific branches created for implementing each functionality separately. This enhances change tracking and collaboration in development.
+
+## Upcoming Features
+
+- **Swagger Documentation**: Upcoming plans include documenting the API using Swagger. This will provide a clear and interactive documentation, making it easier for developers to understand and interact with the API.
+
+- **UUID Implementation**: There is a plan to eliminate the dependency on a relational database by implementing UUID as a unique identifier. This change aims to enhance flexibility and compatibility across different database systems, ensuring a more scalable and adaptable solution.
+
+- **Pagination**: The addition of pagination for index event endpoint. 
+
