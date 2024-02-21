@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Api\V1\Event;
 
 use App\Http\Requests\Api\V1\Event\CreateEventRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 
 class UpdateEventRequest extends CreateEventRequest
 {
@@ -16,5 +19,11 @@ class UpdateEventRequest extends CreateEventRequest
         $rules['recurring_pattern.repeat_until'] = 'sometimes|date_format:Y-m-d\TH:i:sP|after_or_equal:end';
 
         return $rules;
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = new JsonResponse(['errors' => $validator->errors()], 422);
+        throw new HttpResponseException($response);
     }
 }

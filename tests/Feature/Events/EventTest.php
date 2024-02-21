@@ -37,7 +37,7 @@ class EventTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('events', ['id' => $response->json('event')['id']]);
+        $this->assertDatabaseHas('events', ['id' => $response->json('data')['event']['id']]);
     }
 
     public function test_validate_event_creation_and_fails()
@@ -78,8 +78,8 @@ class EventTest extends TestCase
 
         
         $response->assertStatus(201);
-        $this->assertDatabaseHas('events', ['id' => $response->json('event')['id']]);
-        $this->assertDatabaseHas('events', ['original_event_id' => $response->json('event')['id']]);
+        $this->assertDatabaseHas('events', ['id' => $response->json('data')['event']['id']]);
+        $this->assertDatabaseHas('events', ['original_event_id' => $response->json('data')['event']['id']]);
     }
 
     public function test_create_event_fails_by_overlap()
@@ -109,7 +109,7 @@ class EventTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(
             count($events),
-            $response->json('events')
+            $response->json('data')['events']
         );
         $response->assertJsonFragment([
             'id' => $events[0]->id,
@@ -142,7 +142,7 @@ class EventTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(
             1,
-            $response->json('events')
+            $response->json('data')['events']
         );
         $response->assertJsonFragment([
             'id' => $event1->id,

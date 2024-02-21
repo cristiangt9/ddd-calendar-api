@@ -12,33 +12,39 @@ use Illuminate\Http\Request;
 class EventController extends Controller
 {
     private $eventService;
-    private const EVENT_NOT_FOUND = 'event_not_found';
+    private const NOT_FOUND = 'Not found';
+    private const EVENT_NOT_FOUND = 'Event not found';
 
     public function __construct(EventServiceInterface $eventService)
     {
         $this->eventService = $eventService;
     }
 
-    
-    public function index(Request $request): JsonResponse
+
+    public function index(Request $request)
     {
         $start = $request->input('start');
         $end = $request->input('end');
-        
+
         $events = $this->eventService->getEvents($start, $end);
 
-        return response()->json(['events' => $events], 200);
+        return $this->defaultResponse(true, ['events' => $events]);
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $event = $this->eventService->findEventById($id);
 
         if (!$event) {
-            return response()->json(['message' => self::EVENT_NOT_FOUND], 404);
+            return $this->errorResponse(
+                self::NOT_FOUND,
+                ['message' => self::EVENT_NOT_FOUND],
+                404,
+                002
+            );
         }
 
-        return response()->json(['event' => $event->toArray()]);
+        return $this->defaultResponse(true, ['event' => $event->toArray()], 200);
     }
 
     public function store(CreateEventRequest $request)
@@ -48,37 +54,50 @@ class EventController extends Controller
         $createdEvent = $this->eventService->createEvent($validatedData);
 
         if (!$createdEvent) {
-            return response()->json(['message' => 'overlaps'], 422);
+            return $this->errorResponse('overlaps', ['message' => 'overlaps'], 422, 007);
         }
-        return response()->json(['event' => $createdEvent->toArray()], 201);
-        //TODO: estandarizar la respuesta con un trait
-
+        return $this->defaultResponse(true, ['event' => $createdEvent->toArray()], 201);
     }
 
-    public function update(UpdateEventRequest $request, $id): JsonResponse
+    public function update(UpdateEventRequest $request, $id)
     {
         $validatedData = $request->validated();
         $updatedEvent = $this->eventService->updateEvent($id, $validatedData);
 
         if (!$updatedEvent) {
-            return response()->json(['message' => self::EVENT_NOT_FOUND], 404);
+            return $this->errorResponse(
+                self::NOT_FOUND,
+                ['message' => self::EVENT_NOT_FOUND],
+                404,
+                002
+            );
         } else {
             if ($updatedEvent === 'overlap') {
-                return response()->json(['message' => 'overlaps'], 422);
+                return $this->errorResponse(
+                    'overlaps',
+                    ['message' => 'overlaps'],
+                    422,
+                    007
+                );
             }
         }
 
-        return response()->json(['event' => $updatedEvent->toArray()]);
+        return $this->defaultResponse(true, ['event' => $updatedEvent->toArray()],);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy($id)
     {
         $result = $this->eventService->deleteEvent($id);
 
         if (!$result) {
-            return response()->json(['message' => self::EVENT_NOT_FOUND], 404);
+            return $this->errorResponse(
+                self::NOT_FOUND,
+                ['message' => self::EVENT_NOT_FOUND],
+                404,
+                002
+            );
         }
 
-        return response()->json(['message' => 'Event deleted'], 204);
+        return $this->defaultResponse(true, ['message' => 'Event deleted'], 204);
     }
 }
